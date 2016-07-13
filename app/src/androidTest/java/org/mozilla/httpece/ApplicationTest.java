@@ -9,6 +9,7 @@ import android.util.Base64;
 import junit.framework.Assert;
 
 import org.spongycastle.jce.ECNamedCurveTable;
+import org.spongycastle.jce.provider.BouncyCastleProvider;
 import org.spongycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.spongycastle.jce.spec.ECParameterSpec;
 import org.spongycastle.jce.spec.ECPrivateKeySpec;
@@ -98,7 +99,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
 
     public void useDH() throws Exception {
         ECNamedCurveParameterSpec parameterSpec = ECNamedCurveTable.getParameterSpec("prime256v1");
-        KeyPairGenerator g = KeyPairGenerator.getInstance("ECDH", "SC");
+        KeyPairGenerator g = KeyPairGenerator.getInstance("ECDH", BouncyCastleProvider.PROVIDER_NAME);
         g.initialize(parameterSpec);
 
         // The static key is used by the receiver
@@ -174,14 +175,14 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
     public static PublicKey loadPublicKey (byte[] data) throws Exception {
         ECParameterSpec params = ECNamedCurveTable.getParameterSpec("prime256v1");
         ECPublicKeySpec pubKey = new ECPublicKeySpec(params.getCurve().decodePoint(data), params);
-        KeyFactory kf = KeyFactory.getInstance("ECDH", "SC");
+        KeyFactory kf = KeyFactory.getInstance("ECDH", BouncyCastleProvider.PROVIDER_NAME);
         return kf.generatePublic(pubKey);
     }
 
     public static PrivateKey loadPrivateKey(byte[] data) throws Exception {
         ECParameterSpec params = ECNamedCurveTable.getParameterSpec("prime256v1");
         ECPrivateKeySpec prvkey = new ECPrivateKeySpec(new BigInteger(data), params);
-        KeyFactory kf = KeyFactory.getInstance("ECDH", "SC");
+        KeyFactory kf = KeyFactory.getInstance("ECDH", BouncyCastleProvider.PROVIDER_NAME);
         return kf.generatePrivate(prvkey);
     }
 
@@ -232,7 +233,7 @@ public class ApplicationTest extends ApplicationTestCase<Application> {
         HttpEce httpEce = new HttpEce();
 
         ECNamedCurveParameterSpec parameterSpec = ECNamedCurveTable.getParameterSpec("prime256v1");
-        KeyPairGenerator g = KeyPairGenerator.getInstance("ECDH", "SC");
+        KeyPairGenerator g = KeyPairGenerator.getInstance("ECDH", BouncyCastleProvider.PROVIDER_NAME);
         g.initialize(parameterSpec);
 
         // The static key is used by the receiver

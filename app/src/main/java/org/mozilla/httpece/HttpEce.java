@@ -31,6 +31,7 @@ import org.spongycastle.crypto.digests.SHA256Digest;
 import org.spongycastle.crypto.generators.HKDFBytesGenerator;
 import org.spongycastle.crypto.params.HKDFParameters;
 import org.spongycastle.jce.interfaces.ECPublicKey;
+import org.spongycastle.jce.provider.BouncyCastleProvider;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -145,7 +146,7 @@ public class HttpEce {
             return LegacyAESGCM.encrypt(key, nonce, concat(padding, buffer));
         }
 
-        Cipher cipher = Cipher.getInstance(AES_GCM_NO_PADDING, "SC");
+        Cipher cipher = Cipher.getInstance(AES_GCM_NO_PADDING, BouncyCastleProvider.PROVIDER_NAME);
         cipher.init(Cipher.ENCRYPT_MODE, key, new GCMParameterSpec(AUTH_TAG_LENGTH_BITS, nonce));
         byte[] encryptedPadding = cipher.update(padding);
         byte[] encryptedBuffer = cipher.update(buffer);
@@ -187,7 +188,7 @@ public class HttpEce {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT || useLegacyEncryptionMethods) {
             data = LegacyAESGCM.decrypt(key, nonce, buffer);
         } else {
-            Cipher cipher = Cipher.getInstance(AES_GCM_NO_PADDING, "SC");
+            Cipher cipher = Cipher.getInstance(AES_GCM_NO_PADDING, BouncyCastleProvider.PROVIDER_NAME);
             cipher.init(Cipher.DECRYPT_MODE, key, new GCMParameterSpec(AUTH_TAG_LENGTH_BITS, nonce));
             data = concat(cipher.update(buffer), cipher.doFinal());
         }
@@ -241,7 +242,7 @@ public class HttpEce {
     private SecretAndContext generateSecretAndContext(String keyId, PublicKey otherPublicKey, Mode mode) throws NoSuchProviderException, NoSuchAlgorithmException, InvalidKeyException {
         KeyPair ownKeyPair = keyPairs.get(keyId);
 
-        KeyAgreement keyAgreement = KeyAgreement.getInstance("ECDH", "SC");
+        KeyAgreement keyAgreement = KeyAgreement.getInstance("ECDH", BouncyCastleProvider.PROVIDER_NAME);
         keyAgreement.init(ownKeyPair.getPrivate());
         keyAgreement.doPhase(otherPublicKey, true);
         byte[] secret = keyAgreement.generateSecret();
